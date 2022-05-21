@@ -1,5 +1,5 @@
 # pytube 이용 다운로드
-
+import tkinter.ttk as ttk
 from cProfile import label
 from tkinter import *
 from tkinter import filedialog
@@ -13,8 +13,10 @@ def on_complete(stream, filepath):
 	print(filepath)
 
 def on_progress(stream, chunk, bytes_remaining):
-	progress_string = f'{round(100-(bytes_remaining/stream.filesize*100),2)}%'
-	print(progress_string)
+    progress = round(100-(bytes_remaining/stream.filesize*100),2)
+    p_var.set(progress)
+    progress_bar.update()
+    print(progress)
 
 # link= input("youtube link: ")
 # video_object = YouTube(link, on_complete_callback=on_complete,on_progress_callback= on_progress)
@@ -38,7 +40,7 @@ def on_progress(stream, chunk, bytes_remaining):
 	
 root = Tk()
 root.title("Youtube DownLoader--by Dongeal Im")
-root.geometry("640x500+300+100")
+root.geometry("640x600+300+100")
 root.resizable(False,False) 
 
 canvas=Canvas(root)
@@ -64,6 +66,7 @@ def browse_dest_path():
 
 def url_download():
     url=url_name.get()
+    p_var.set(0)
     video_object = YouTube(url, on_complete_callback=on_complete,on_progress_callback= on_progress)
     
     if len(entry_dest_path.get()) == 0:
@@ -72,11 +75,12 @@ def url_download():
     if len(url_name.get()) == 0:
         msgbox.showwarning("경고", "동영상 Url을 입력하세요")
         return    
-    
+   
     match flty.get():
         case '1':
            root.title("고화질 동영상 다운로드 중 ---")
            video_object.streams.get_highest_resolution().download(folder_selected)
+          
         case '2':
            root.title("저화질 동영상 다운로드 중 ---")
            video_object.streams.get_lowest_resolution().download(folder_selected)
@@ -125,6 +129,14 @@ btn3=Radiobutton(root, text="Mp3",value="3", variable=flty)
 btn1.pack()
 btn2.pack()
 btn3.pack()
+
+# 진행 상황 Progress Bar
+frame_progress = LabelFrame(root, text="진행상황")
+frame_progress.pack(fill="x", padx=5, pady=5, ipady=5)
+
+p_var = DoubleVar()
+progress_bar = ttk.Progressbar(frame_progress, maximum=100, variable=p_var)
+progress_bar.pack(fill="x", padx=5, pady=5)
 
 # def btncmd():
    
